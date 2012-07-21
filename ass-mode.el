@@ -75,9 +75,6 @@
 (defun ass-get-current-time ()
   "Get time of the event under point"
   (nth 1 (split-string (thing-at-point 'line) ","))
-  ;(nth
-   ;(position "Start" (ass-get-events-format-list))
-   ;(split-string (thing-at-point 'line) ","))
   )
 
 
@@ -103,8 +100,6 @@
   (save-excursion
     (defvar point-start (search-forward-regexp "\\[Events\\]" nil t))
     (goto-char 0)
-    ;(defvar point-end (search-forward-regexp
-                                        ;"\\[V4\\+?\\(.*\n\\)*\\[" nil t))
     (defvar point-end (buffer-size))
     (buffer-substring-no-properties point-start point-end))
   )
@@ -114,14 +109,13 @@
   (let ((s (if (symbolp str) (symbol-name str) str)))
     (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
 
-(defun ass-get-events-format-list ()
-  ""
+(defun ass-get-events-format ()
+  "Return events format string"
   (mapcar 'chomp (split-string (nth 1 (split-string (nth 1 (split-string (ass-get-events-list) "\n")) ":")) ","))
   )
 
 (defun ass-create-list-of-styles-buffer ()
   "Creates buffer with list of ASS styles"
-  ; (generate-new-buffer "ASS Styles")
   (with-output-to-temp-buffer "ASS Styles"
     (with-current-buffer "ASS Styles"
       (print "Style name")
@@ -130,11 +124,14 @@
 
 (defun print-debug ()
   (interactive)
-  ;(print (find "Start" (ass-get-events-format-list)))
-  (print (find "Start"
-               (ass-get-events-format-list)
-               )
-         )
+  (print
+   (ass-get-events-format)   
+   )
+  )
+
+(defun print-events-list ()
+  (interactive)
+  (print (ass-get-events-list))
   )
 
 (defun mplayer ()
@@ -145,9 +142,22 @@
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 (defvar ass-mode-map (make-keymap))
+(define-key ass-mode-map "\C-c\C-e" 'print-events-list)
 (define-key ass-mode-map "\C-c\C-o" 'mplayer)
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
-;(define-key ass-mode-map "\C-c\C-l" 'ass-get-timestamp-start-n)
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
+
+; TODO: mkvmerge -i filename.mkv | grep subtitles
+(defun extract-subtitles-from-mkv
+  (let ((lang (getenv "LANG")))
+    (setenv "LANG" "C")
+    (call-process "mkvextract"
+                  nil
+                  nil       ; буфер для вывода
+                  nil
+                  "tracks"
+                  "/mnt/home/Strike Witches 2-ki [BD] [720p]/Strike Witches 2 - 01 (BD 1280x720 h264 FLAC) [Coalgirls].mkv"
+                  "3:/home/nerevar/1.ass")
+    (setenv "LANG" lang)))
