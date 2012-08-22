@@ -96,7 +96,7 @@
 
 (defun ass-get-events-list ()
   "Вовращает список описания событий (вместе с форматной строкой сверху)"
-  (interactive)
+  ;(interactive)
   (save-excursion
     (defvar point-start (search-forward-regexp "\\[Events\\]" nil t))
     (goto-char 0)
@@ -109,9 +109,9 @@
   (let ((s (if (symbolp str) (symbol-name str) str)))
     (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
 
-(defun ass-get-events-format ()
+(defun ass-get-events-format (events-string)
   "Return events format string"
-  (mapcar 'chomp (split-string (nth 1 (split-string (nth 1 (split-string (ass-get-events-list) "\n")) ":")) ","))
+  (mapcar 'chomp (split-string (nth 1 (split-string (nth 1 (split-string events-string "\n")) ":")) ","))
   )
 
 (defun ass-create-list-of-styles-buffer ()
@@ -125,7 +125,7 @@
 (defun print-debug ()
   (interactive)
   (print
-   (ass-get-events-format)   
+   (ass-get-events-format (ass-get-events-list))
    )
   )
 
