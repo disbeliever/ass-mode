@@ -36,8 +36,20 @@
   (print ass-style-get-format)
   )
 
+(defun ass-timestamp-to-seconds (timestamp)
+  (defvar minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+  (defvar seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+  ;(defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
+  (defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
+  (+
+   (* minutes 60)
+   seconds
+   mseconds
+   )
+  )
+
 (defun ass-shift-timestamp (timestamp shift-amount)
-  ; (parse-time-string "0:04:27.95")
+  (ass-timestamp-to-seconds "0:04:27.95")
   ; 1. convert to seconds
   ; 2. convert seconds to time
   ;(seconds-to-time)
