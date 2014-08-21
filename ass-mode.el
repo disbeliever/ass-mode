@@ -11,8 +11,9 @@
 (defvar ass-font-lock-keywords
   (list
    '("\\;.*" . 'font-lock-comment-face)
+   '("^Comment" . 'font-lock-comment-face)
    '("^[ \t]*\\[\\(.+\\)\\]" . 'font-lock-type-face)
-   '("^.+\:.*" . 'font-lock-keywords-face)
+   '("^\\(.+\\)\:" . 'font-lock-keyword-face)
    ))
 
 (defun mkv-get-tracks (file-name)
@@ -49,13 +50,12 @@
   )
 
 (defun ass-shift-timestamp (timestamp shift-amount)
-  (ass-timestamp-to-seconds "0:04:27.95")
+  (+ (ass-timestamp-to-seconds timestamp) shift-amount)
   ; 1. convert to seconds
-  ; 2. convert seconds to time
-  ;(seconds-to-time)
-  ; 3. add shift
-  ; (time-add)
-  ; 4. convert to string
+  ; 2. add shift
+  ; (+)
+  ; 3. convert back to timestamp
+  ; (ass-seconds-to-timestamp)
   )
 
 (defun ass-change-frame-rate (old new)
@@ -151,12 +151,19 @@
   (interactive)
   (start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-time) (ass-get-video-name))
   )
+
+(defun shift-time (shift-amount)
+  (interactive "nEnter shift amount: ")
+  (print (ass-shift-timestamp "0:04:27.95" shift-amount))
+  )
+
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
 (define-key ass-mode-map "\C-c\C-o" 'mplayer)
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
+(define-key ass-mode-map "\C-c\C-s" 'shift-time)
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
