@@ -38,25 +38,54 @@
   )
 
 (defun ass-timestamp-to-seconds (timestamp)
-  (defvar minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
-  (defvar seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
-  ;(defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
-  (defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
-  (+
-   (* minutes 60)
-   seconds
-   mseconds
-   )
+  ;; (defvar minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+  ;; (defvar seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+  ;; (defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
+  ;; (+
+  ;;  (* minutes 60)
+  ;;  seconds
+  ;;  mseconds
+  ;;  )
+  (let (
+        (minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+        (seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
+        (mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
+        )
+    (+
+     (* minutes 60)
+     seconds
+     mseconds
+     )
+    )
   )
 
 (defun ass-shift-timestamp (timestamp shift-amount)
-  (+ (ass-timestamp-to-seconds timestamp) shift-amount)
-  ; 1. convert to seconds
-  ; 2. add shift
-  ; (+)
-  ; 3. convert back to timestamp
-  ; (ass-seconds-to-timestamp)
+  ;(defvar shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
+  ;(defvar hours (floor (/ shifted-seconds 3600)))
+  ;(defvar minutes (- shifted-seconds (* hours 3600)))
+  ;(defvar seconds)
+  (let* (
+        (shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
+        (hours (floor (/ shifted-seconds 3600)))
+        (minutes (floor (/ (- shifted-seconds (* hours 3600)) 60)))
+        (seconds (floor (- shifted-seconds (* hours 3600) (* minutes 60))))
+        (mseconds (nth 1 (split-string (number-to-string shifted-seconds) "\\.")) )
+        )
+    ;(print hours)
+    ;(print minutes)
+    ;(print seconds)
+    ;(print mseconds)
+    ;shifted-seconds
+    (format "%d:%d:%d.%s" hours minutes seconds mseconds)
+    )
+                                        ; 1. convert to seconds
+                                        ; 2. add shift
+                                        ; (+)
+                                        ; 3. convert back to timestamp
+                                        ; (ass-seconds-to-timestamp)
   )
+
+(ass-shift-timestamp "0:24:33.95" 100.5)
 
 (defun ass-change-frame-rate (old new)
   ""
