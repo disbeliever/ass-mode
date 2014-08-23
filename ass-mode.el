@@ -77,10 +77,6 @@
   )
 
 (defun ass-shift-timestamp (timestamp shift-amount)
-  ;(defvar shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
-  ;(defvar hours (floor (/ shifted-seconds 3600)))
-  ;(defvar minutes (- shifted-seconds (* hours 3600)))
-  ;(defvar seconds)
   (let* (
         (shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
         (hours (floor (/ shifted-seconds 3600)))
@@ -88,21 +84,9 @@
         (seconds (floor (- shifted-seconds (* hours 3600) (* minutes 60))))
         (mseconds (nth 1 (split-string (number-to-string shifted-seconds) "\\.")) )
         )
-    ;(print hours)
-    ;(print minutes)
-    ;(print seconds)
-    ;(print mseconds)
-    ;shifted-seconds
-    (format "%d:%d:%d.%s" hours minutes seconds mseconds)
+    (format "%d:%02d:%02d.%s" hours minutes seconds mseconds)
     )
-                                        ; 1. convert to seconds
-                                        ; 2. add shift
-                                        ; (+)
-                                        ; 3. convert back to timestamp
-                                        ; (ass-seconds-to-timestamp)
   )
-
-(ass-shift-timestamp "0:24:33.95" 100.5)
 
 (defun ass-change-frame-rate (old new)
   ""
@@ -200,7 +184,18 @@
 
 (defun shift-time (shift-amount)
   (interactive "nEnter shift amount: ")
-  (print (ass-shift-timestamp "0:04:27.95" shift-amount))
+  ;(buffer-substring-no-properties (line-beginning-position) (line-end-position))
+  (save-excursion
+    (let
+        (
+         (shifted-time (ass-shift-timestamp (ass-get-current-time) shift-amount))
+         )
+      (beginning-of-line)
+      (search-forward (ass-get-current-time))
+      (replace-match shifted-time)
+      )
+    )
+  ;(print (ass-shift-timestamp (ass-get-current-time) shift-amount))
   )
 
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
