@@ -30,7 +30,7 @@
    '("\\;.*" . 'font-lock-comment-face)
    '("^Comment" . 'font-lock-comment-face)
    '("^[ \t]*\\[\\(.+\\)\\]" . 'font-lock-type-face)
-   '("^\\(.+\\)\:" . 'font-lock-keyword-face)
+   '("^\\(\\w+\\)\:" . 'font-lock-keyword-face)
    ))
 
 (defun mkv-get-tracks (file-name)
@@ -55,14 +55,6 @@
   )
 
 (defun ass-timestamp-to-seconds (timestamp)
-  ;; (defvar minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
-  ;; (defvar seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
-  ;; (defvar mseconds (string-to-number (concat "0." (nth 1 (split-string timestamp "\\." 1)))))
-  ;; (+
-  ;;  (* minutes 60)
-  ;;  seconds
-  ;;  mseconds
-  ;;  )
   (let (
         (minutes (string-to-number (nth 1 (split-string (car (split-string timestamp "\\.")) ":" 2))))
         (seconds (string-to-number (nth 2 (split-string (car (split-string timestamp "\\.")) ":" 2))))
@@ -114,9 +106,14 @@
    )
   )
 
-(defun ass-get-current-time ()
-  "Get time of the event under point"
+(defun ass-get-current-start-time ()
+  "Get start time of the event under point"
   (nth 1 (split-string (thing-at-point 'line) ","))
+  )
+
+(defun ass-get-current-end-time ()
+  "Get end time of the event under point"
+  (nth 2 (split-string (thing-at-point 'line) ","))
   )
 
 
@@ -179,23 +176,29 @@
 (defun mplayer ()
   "Run mplayer"
   (interactive)
-  (start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-time) (ass-get-video-name))
+  (start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name))
   )
 
 (defun shift-time (shift-amount)
   (interactive "nEnter shift amount: ")
   ;(buffer-substring-no-properties (line-beginning-position) (line-end-position))
   (save-excursion
-    (let
+    (let*
         (
-         (shifted-time (ass-shift-timestamp (ass-get-current-time) shift-amount))
+         (start-time (ass-get-current-start-time))
+         (end-time (ass-get-current-end-time))
+         (shifted-start-time (ass-shift-timestamp start-time shift-amount))
+         (shifted-end-time (ass-shift-timestamp end-time shift-amount))
          )
       (beginning-of-line)
-      (search-forward (ass-get-current-time))
-      (replace-match shifted-time)
+      (search-forward start-time)
+      (replace-match shifted-start-time)
+
+      (search-forward end-time)
+      (replace-match shifted-end-time)
       )
     )
-  ;(print (ass-shift-timestamp (ass-get-current-time) shift-amount))
+  ;(print (ass-shift-timestamp (ass-get-current-start-time) shift-amount))
   )
 
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
