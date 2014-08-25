@@ -38,15 +38,21 @@
   (start-process "mkvmerge" nil "mkvmerge" "--identify" file-name)
   )
 
-(defun ass-frame-rate-mkv (file-name)
-  "Get frame rate of mkv file. mediainfo is needed"
-  (interactive)
-  (defvar output (process-lines "mediainfo" file-name))
-  (print output)
-  )
-
-(defun ass-get-frame-rate ()
-  ; Try to get frame-rate from video file (if it exists)
+(defun ass-get-frame-rate (file-name)
+  "Get frame rate of video file. mediainfo is needed"
+  (let
+      (
+       (output (process-lines "mediainfo" file-name))
+       )
+    (save-match-data
+      (let (
+            (matched (nth 0 (remove-if (lambda (x) (not (string-match "^Frame rate  .+\:" x))) output)))
+            )
+        (string-match "^Frame rate  .+\: \\([0-9]+\.[0-9]+\\) fps" matched)
+        (string-to-number (match-string 1 matched))
+        )
+      )
+    )
   )
 
 (defun ass-get-timestamp-start-n ()
@@ -180,8 +186,7 @@
   )
 
 (defun shift-time (shift-amount)
-  (interactive "nEnter shift amount: ")
-  ;(buffer-substring-no-properties (line-beginning-position) (line-end-position))
+  (interactive "nEnter shift amount in seconds: ")
   (save-excursion
     (let*
         (
@@ -198,7 +203,6 @@
       (replace-match shifted-end-time)
       )
     )
-  ;(print (ass-shift-timestamp (ass-get-current-start-time) shift-amount))
   )
 
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
@@ -208,6 +212,7 @@
 (define-key ass-mode-map "\C-c\C-o" 'mplayer)
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
 (define-key ass-mode-map "\C-c\C-s" 'shift-time)
+(define-key ass-mode-map "\C-c\C-f" (lambda () (interactive) (print (ass-get-frame-rate (ass-get-video-name)))))
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
