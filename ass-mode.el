@@ -55,9 +55,9 @@
     )
   )
 
-(defun ass-get-timestamp-start-n ()
-  "Where is start timestamp in Format: string"
-  (print ass-style-get-format)
+(defun ass-get-event-parameter-position (parameter)
+  "Where is parameter in Format: string"
+  (position parameter (ass-get-events-format) :test #'equal)
   )
 
 (defun ass-timestamp-to-seconds (timestamp)
@@ -114,12 +114,12 @@
 
 (defun ass-get-current-start-time ()
   "Get start time of the event under point"
-  (nth 1 (split-string (thing-at-point 'line) ","))
+  (nth (ass-get-event-parameter-position "Start") (split-string (thing-at-point 'line) ","))
   )
 
 (defun ass-get-current-end-time ()
   "Get end time of the event under point"
-  (nth 2 (split-string (thing-at-point 'line) ","))
+  (nth (ass-get-event-parameter-position "End") (split-string (thing-at-point 'line) ","))
   )
 
 
@@ -133,20 +133,28 @@
   "Вовращает список описания стилей (вместе с форматной строкой сверху)"
   (interactive)
   (save-excursion
-    (defvar point-start (search-forward-regexp "\\[V4\\+?.+\\]" nil t))
     (goto-char 0)
+    (defvar point-start (search-forward-regexp "\\[V4\\+?.+\\]" nil t))
     (defvar point-end (search-forward-regexp "\\[V4\\+?\\(.*\n\\)*\\[" nil t))
     (buffer-substring-no-properties point-start point-end))
   )
 
 (defun ass-get-events-list ()
   "Вовращает список описания событий (вместе с форматной строкой сверху)"
-  ;(interactive)
   (save-excursion
-    (defvar point-start (search-forward-regexp "\\[Events\\]" nil t))
     (goto-char 0)
+    (defvar point-start (search-forward-regexp "\\[Events\\]" nil t))
     (defvar point-end (buffer-size))
     (buffer-substring-no-properties point-start point-end))
+  )
+
+(defun ass-get-events-format ()
+  "Return events format string"
+  (let (
+        (format-string (nth 1 (split-string (ass-get-events-list) "\n")))
+        )
+    (mapcar 'chomp (split-string (nth 1 (split-string format-string ":")) ","))
+    )
   )
 
 (defun chomp (str)
@@ -154,24 +162,17 @@
   (let ((s (if (symbolp str) (symbol-name str) str)))
     (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
 
-(defun ass-get-events-format (events-string)
-  "Return events format string"
-  (mapcar 'chomp (split-string (nth 1 (split-string (nth 1 (split-string events-string "\n")) ":")) ","))
-  )
+;; (defun ass-create-list-of-styles-buffer ()
+;;   "Creates buffer with list of ASS styles"
+;;   (with-output-to-temp-buffer "ASS Styles"
+;;     (with-current-buffer "ASS Styles"
+;;       (print "Style name")
+;;       (ass-mode)))
+;;   )
 
-(defun ass-create-list-of-styles-buffer ()
-  "Creates buffer with list of ASS styles"
-  (with-output-to-temp-buffer "ASS Styles"
-    (with-current-buffer "ASS Styles"
-      (print "Style name")
-      (ass-mode)))
-  )
-
-(defun print-debug ()
+(defun print-events-format ()
   (interactive)
-  (print
-   (ass-get-events-format (ass-get-events-list))
-   )
+  (print (ass-get-events-format))
   )
 
 (defun print-events-list ()
