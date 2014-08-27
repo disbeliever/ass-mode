@@ -17,9 +17,6 @@
 
 (require 'ass-mode)
 
-;(ass-get-events-list)
-;(defvar test-string)
-
 (ert-deftest ass-timestamp-to-seconds-test()
   ""
   (should
@@ -40,3 +37,15 @@
     )
    )
   )
+
+(ert-deftest ass-change-frame-rate-test()
+  ""
+  (should
+   (equal
+    (ass-change-frame-rate "0:15:21.02" 23.976 25)
+"0:14:43.29"
+    )
+   )
+  )
+
+

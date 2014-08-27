@@ -74,23 +74,41 @@
     )
   )
 
-(defun ass-shift-timestamp (timestamp shift-amount)
+(defun ass-seconds-to-timestamp (sec)
   (let* (
-        (shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
-        (hours (floor (/ shifted-seconds 3600)))
-        (minutes (floor (/ (- shifted-seconds (* hours 3600)) 60)))
-        (seconds (floor (- shifted-seconds (* hours 3600) (* minutes 60))))
-        (mseconds (nth 1 (split-string (number-to-string shifted-seconds) "\\.")) )
+        (hours (floor (/ sec 3600)))
+        (minutes (floor (/ (- sec (* hours 3600)) 60)))
+        (seconds (floor (- sec (* hours 3600) (* minutes 60))))
+        (mseconds (nth 1 (split-string (number-to-string sec) "\\.")) )
         )
-    (format "%d:%02d:%02d.%s" hours minutes seconds mseconds)
+    (format "%d:%02d:%02d.%s" hours minutes seconds (substring mseconds 0 2))
     )
   )
 
-(defun ass-change-frame-rate (old new)
+(defun ass-shift-timestamp (timestamp shift-amount)
+  (let (
+        (shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
+        )
+    (ass-seconds-to-timestamp shifted-seconds)
+    )
+  )
+
+(defun ass-change-frame-rate (timestamp fps-old fps-new)
   ""
+  (let* (
+         (factor (/ fps-old fps-new))
+         (shifted-seconds (* (ass-timestamp-to-seconds timestamp) factor))
+         )
+    (print factor)
+    (print (ass-timestamp-to-seconds timestamp))
+    (ass-seconds-to-timestamp shifted-seconds)
+    )
   ; scaleFactor = from / to
   ; shift_mseconds + m_seconds*scaleFactor + 0.5
 )
+
+(ass-change-frame-rate "00:15:21.020" 23.976 25)
+; 00:14:43.295
 
 (defun ass-get-buffer-file-name (ext)
   ""
