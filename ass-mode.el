@@ -99,16 +99,9 @@
          (factor (/ fps-old fps-new))
          (shifted-seconds (* (ass-timestamp-to-seconds timestamp) factor))
          )
-    (print factor)
-    (print (ass-timestamp-to-seconds timestamp))
     (ass-seconds-to-timestamp shifted-seconds)
     )
-  ; scaleFactor = from / to
-  ; shift_mseconds + m_seconds*scaleFactor + 0.5
 )
-
-(ass-change-frame-rate "00:15:21.020" 23.976 25)
-; 00:14:43.295
 
 (defun ass-get-buffer-file-name (ext)
   ""
@@ -204,7 +197,7 @@
   (start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name))
   )
 
-(defun shift-time (shift-amount)
+(defun ass-shift-time (shift-amount)
   (interactive "nEnter shift amount in seconds: ")
   (save-excursion
     (let*
@@ -224,14 +217,38 @@
     )
   )
 
+(defun ass-change-fps (fps-old fps-new)
+  (interactive
+   (list
+    (read-number "Old FPS: " (ass-get-frame-rate (ass-get-video-name)))
+    (read-number "New FPS: ")
+    ))
+  (save-excursion
+    (let*
+      (
+       (start-time (ass-get-current-start-time))
+       (end-time (ass-get-current-end-time))
+       (shifted-start-time (ass-change-frame-rate start-time fps-old fps-new))
+       (shifted-end-time (ass-change-frame-rate end-time fps-old fps-new))
+       )
+      (beginning-of-line)
+      (search-forward start-time)
+      (replace-match shifted-start-time)
+
+      (search-forward end-time)
+      (replace-match shifted-end-time)      
+      )
+    )
+  )
+
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
 (define-key ass-mode-map "\C-c\C-o" 'mplayer)
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
-(define-key ass-mode-map "\C-c\C-s" 'shift-time)
-(define-key ass-mode-map "\C-c\C-f" (lambda () (interactive) (print (ass-get-frame-rate (ass-get-video-name)))))
+(define-key ass-mode-map "\C-c\C-s" 'ass-shift-time)
+(define-key ass-mode-map "\C-c\C-f" 'ass-change-fps)
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
