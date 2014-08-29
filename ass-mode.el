@@ -35,7 +35,8 @@
 
 (defun mkv-get-tracks (file-name)
   "Получает список дорожек (с целью выцепить потом из них дорожки с сабами)"
-  (start-process "mkvmerge" nil "mkvmerge" "--identify" file-name)
+  (interactive)
+  (process-lines "mkvmerge" "--identify" file-name)
   )
 
 (defun ass-get-frame-rate (file-name)

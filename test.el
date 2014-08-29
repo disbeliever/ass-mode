@@ -27,6 +27,16 @@
    )
   )
 
+(ert-deftest ass-seconds-to-timestamp-test()
+  ""
+  (should
+   (equal
+    (ass-seconds-to-timestamp 1473.95)
+    "0:24:33.95"
+    )
+   )
+  )
+
 
 (ert-deftest ass-shift-timestamp-test()
   ""
