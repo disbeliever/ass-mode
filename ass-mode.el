@@ -24,6 +24,7 @@
 (setq ass-hash-event-format (make-hash-table :test 'equal))
 
 (defvar ass-media-player "mplayer2")
+(defvar ass-media-player-parameters "")
 
 (defvar ass-font-lock-keywords
   (list
@@ -192,10 +193,10 @@
   (print (ass-get-events-list))
   )
 
-(defun mplayer ()
+(defun ass-mplayer ()
   "Run mplayer"
   (interactive)
-  (start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name))
+  (apply 'start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name) (split-string ass-media-player-parameters " "))
   )
 
 (defun ass-shift-time (shift-amount)
@@ -246,7 +247,7 @@
 
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
-(define-key ass-mode-map "\C-c\C-o" 'mplayer)
+(define-key ass-mode-map "\C-c\C-o" 'ass-mplayer)
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
 (define-key ass-mode-map "\C-c\C-s" 'ass-shift-time)
 (define-key ass-mode-map "\C-c\C-f" 'ass-change-fps)
