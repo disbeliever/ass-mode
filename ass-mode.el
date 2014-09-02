@@ -147,18 +147,27 @@
   (interactive)
   (save-excursion
     (goto-char 0)
-    (defvar point-start (search-forward-regexp "\\[V4\\+?.+\\]" nil t))
-    (defvar point-end (search-forward-regexp "\\[V4\\+?\\(.*\n\\)*\\[" nil t))
-    (buffer-substring-no-properties point-start point-end))
+    (let*
+        (
+         (point-start (search-forward-regexp "\\[V4\\+?.+\\]" nil t))
+         (point-end (search-forward-regexp "\\[V4\\+?\\(.*\n\\)*\\[" nil t))
+         )
+      (buffer-substring-no-properties point-start point-end))
+    )
   )
 
 (defun ass-get-events-list ()
   "Вовращает список описания событий (вместе с форматной строкой сверху)"
   (save-excursion
     (goto-char 0)
-    (defvar point-start (search-forward-regexp "\\[Events\\]" nil t))
-    (defvar point-end (buffer-size))
-    (buffer-substring-no-properties point-start point-end))
+    (let*
+        (
+         (point-start (search-forward-regexp "\\[Events\\]" nil t))
+         (point-end (buffer-size))
+         )
+      (buffer-substring-no-properties point-start point-end)
+      )
+    )
   )
 
 (defun ass-get-events-format ()
