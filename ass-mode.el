@@ -252,6 +252,18 @@
     )
   )
 
+(defun ass-new-entry ()
+  (interactive)
+  (let*
+      (
+       (end-time (ass-get-current-end-time))
+       (shifted-end-time (ass-shift-timestamp end-time))
+       )
+    (move-end-of-line 1)
+    (newline)
+    )
+  )
+
 (add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 (defvar ass-mode-map (make-keymap))
@@ -260,6 +272,7 @@
 (define-key ass-mode-map "\C-c\C-l" 'print-debug)
 (define-key ass-mode-map "\C-c\C-s" 'ass-shift-time)
 (define-key ass-mode-map "\C-c\C-f" 'ass-change-fps)
+(define-key ass-mode-map "\C-c\C-n" 'ass-new-entry)
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
