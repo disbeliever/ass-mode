@@ -256,11 +256,23 @@
   (interactive)
   (let*
       (
-       (end-time (ass-get-current-end-time))
-       (shifted-end-time (ass-shift-timestamp end-time))
+       (old-start-time (ass-get-current-start-time))
+       (old-end-time (ass-get-current-end-time))
+       (old-line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+       (new-start-time old-end-time)
+       (new-end-time (ass-shift-timestamp new-start-time 2))
        )
     (move-end-of-line 1)
     (newline)
+    (princ old-line (current-buffer))
+    (save-excursion
+      (beginning-of-line)
+      (search-forward old-start-time)
+      (replace-match new-start-time)
+
+      (search-forward old-end-time)
+      (replace-match new-end-time)
+      )
     )
   )
 
