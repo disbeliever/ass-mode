@@ -15,8 +15,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-derived-mode ass-mode fundamental-mode
-  (setq mode-name "ASS/SSA")
+(define-derived-mode ass-mode fundamental-mode "SSA/ASS"
+  "Major mode for editing SSA/ASS ((Advanced) SubStation Alpha) subtitles"
   (setq font-lock-defaults '(ass-font-lock-keywords nil t nil nil))
   )
 
@@ -77,6 +77,7 @@
   )
 
 (defun ass-seconds-to-timestamp (sec)
+  "Converts number of seconds to timestamp (h:mm:ss.ms)"
   (let* (
         (hours (floor (/ sec 3600)))
         (minutes (floor (/ (- sec (* hours 3600)) 60)))
@@ -88,6 +89,7 @@
   )
 
 (defun ass-shift-timestamp (timestamp shift-amount)
+  "Calculate new timestamp by shifting it forward/backward"
   (let (
         (shifted-seconds (+ (ass-timestamp-to-seconds timestamp) shift-amount))
         )
@@ -96,7 +98,7 @@
   )
 
 (defun ass-change-frame-rate (timestamp fps-old fps-new)
-  ""
+  "Calculate new timestamp considering change in framerate"
   (let* (
          (factor (/ fps-old fps-new))
          (shifted-seconds (* (ass-timestamp-to-seconds timestamp) factor))
@@ -117,7 +119,7 @@
   )
 
 (defun ass-get-video-name ()
-  "Construct the name of the video file"
+  "Construct the name of the video file for current buffer"
   (cond
    ((file-readable-p (ass-get-buffer-file-name ".mp4")) (ass-get-buffer-file-name ".mp4"))
    ((file-readable-p (ass-get-buffer-file-name ".mkv")) (ass-get-buffer-file-name ".mkv"))
@@ -143,7 +145,7 @@
   )
 
 (defun ass-get-styles-list ()
-  "Вовращает список описания стилей (вместе с форматной строкой сверху)"
+  "Return styles list (with 'Format:' string)"
   (interactive)
   (save-excursion
     (goto-char 0)
@@ -157,7 +159,7 @@
   )
 
 (defun ass-get-events-list ()
-  "Вовращает список описания событий (вместе с форматной строкой сверху)"
+  "Return events list (with 'Format:' string)"
   (save-excursion
     (goto-char 0)
     (let*
@@ -203,12 +205,13 @@
   )
 
 (defun ass-mplayer ()
-  "Run mplayer"
+  "Run mplayer for event under point"
   (interactive)
   (apply 'start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name) (split-string ass-media-player-parameters " "))
   )
 
 (defun ass-shift-time (shift-amount)
+  "Calculate new timestamp for event under point by shifting it forward/backward by SHIFT-AMOUNT of seconds"
   (interactive "nEnter shift amount in seconds: ")
   (save-excursion
     (let*
@@ -229,6 +232,7 @@
   )
 
 (defun ass-change-fps (fps-old fps-new)
+  "Calculate new timestamp for event under point considering change in framerate"
   (interactive
    (list
     (read-number "Old FPS: " (ass-get-frame-rate (ass-get-video-name)))
@@ -281,7 +285,7 @@
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
 (define-key ass-mode-map "\C-c\C-o" 'ass-mplayer)
-(define-key ass-mode-map "\C-c\C-l" 'print-debug)
+;(define-key ass-mode-map "\C-c\C-l" 'print-debug)
 (define-key ass-mode-map "\C-c\C-s" 'ass-shift-time)
 (define-key ass-mode-map "\C-c\C-f" 'ass-change-fps)
 (define-key ass-mode-map "\C-c\C-n" 'ass-new-entry)
@@ -295,7 +299,7 @@
     (setenv "LANG" "C")
     (call-process "mkvextract"
                   nil
-                  nil       ; буфер для вывода
+                  nil       ; output buffer
                   nil
                   "tracks"
                   "/mnt/home/Strike Witches 2-ki [BD] [720p]/Strike Witches 2 - 01 (BD 1280x720 h264 FLAC) [Coalgirls].mkv"
