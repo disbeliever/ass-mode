@@ -21,10 +21,10 @@
   )
 
 
-(setq ass-hash-event-format (make-hash-table :test 'equal))
+(make-local-variable 'event-format)
 
-(defvar ass-media-player "mplayer2")
-(defvar ass-media-player-parameters "")
+(defvar ass-media-player "mplayer")
+(defvar ass-media-player-parameters "-ss")
 
 (defvar ass-font-lock-keywords
   (list
@@ -113,11 +113,6 @@
           ext
           ))
 
-(defun ass-get-subtitles-from-mkv (file-name)
-  ; TODO: much work here
-  (process-lines "mkvmerge" "--identify" file-name)
-  )
-
 (defun ass-get-video-name ()
   "Construct the name of the video file for current buffer"
   (cond
@@ -186,14 +181,6 @@
   (let ((s (if (symbolp str) (symbol-name str) str)))
     (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
 
-;; (defun ass-create-list-of-styles-buffer ()
-;;   "Creates buffer with list of ASS styles"
-;;   (with-output-to-temp-buffer "ASS Styles"
-;;     (with-current-buffer "ASS Styles"
-;;       (print "Style name")
-;;       (ass-mode)))
-;;   )
-
 (defun print-events-format ()
   (interactive)
   (print (ass-get-events-format))
@@ -207,7 +194,16 @@
 (defun ass-mplayer ()
   "Run mplayer for event under point"
   (interactive)
-  (apply 'start-process ass-media-player nil ass-media-player "-ss" (ass-get-current-start-time) (ass-get-video-name) (split-string ass-media-player-parameters " "))
+  (apply 'start-process
+         ass-media-player
+         nil
+         ass-media-player
+         (ass-get-video-name)
+         (append
+          (split-string ass-media-player-parameters " ")
+          (list (ass-get-current-start-time))
+          )
+         )
   )
 
 (defun ass-shift-time (shift-amount)
@@ -285,23 +281,9 @@
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
 (define-key ass-mode-map "\C-c\C-o" 'ass-mplayer)
-;(define-key ass-mode-map "\C-c\C-l" 'print-debug)
 (define-key ass-mode-map "\C-c\C-s" 'ass-shift-time)
 (define-key ass-mode-map "\C-c\C-f" 'ass-change-fps)
 (define-key ass-mode-map "\C-c\C-n" 'ass-new-entry)
 (use-local-map ass-mode-map)
 
 (provide 'ass-mode)
-
-; TODO: mkvmerge -i filename.mkv | grep subtitles
-(defun extract-subtitles-from-mkv
-  (let ((lang (getenv "LANG")))
-    (setenv "LANG" "C")
-    (call-process "mkvextract"
-                  nil
-                  nil       ; output buffer
-                  nil
-                  "tracks"
-                  "/mnt/home/Strike Witches 2-ki [BD] [720p]/Strike Witches 2 - 01 (BD 1280x720 h264 FLAC) [Coalgirls].mkv"
-                  "3:/home/nerevar/1.ass")
-    (setenv "LANG" lang)))
