@@ -15,6 +15,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(require 's)
+
 (define-derived-mode ass-mode fundamental-mode "SSA/ASS"
   "Major mode for editing SSA/ASS ((Advanced) SubStation Alpha) subtitles"
   (setq font-lock-defaults '(ass-font-lock-keywords nil t nil nil))
@@ -172,14 +174,9 @@
   (let (
         (format-string (nth 1 (split-string (ass-get-events-list) "\n")))
         )
-    (mapcar 'chomp (split-string (nth 1 (split-string format-string ":")) ","))
+    (mapcar 's-trim (split-string (nth 1 (split-string format-string ":")) ","))
     )
   )
-
-(defun chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (let ((s (if (symbolp str) (symbol-name str) str)))
-    (replace-regexp-in-string "\\(^[[:space:]\n]*\\|[[:space:]\n]*$\\)" "" s)))
 
 (defun print-events-format ()
   (interactive)
