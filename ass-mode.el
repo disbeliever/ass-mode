@@ -52,7 +52,7 @@
       (let (
             (matched (nth 0 (remove-if (lambda (x) (not (string-match "^Frame rate  .+\:" x))) output)))
             )
-        (string-match "^Frame rate  .+\: \\([0-9]+\.[0-9]+\\) fps" matched)
+        (string-match "^Frame rate  .+\: \\([0-9]+\.[0-9]+\\)" matched)
         (string-to-number (match-string 1 matched))
         )
       )
