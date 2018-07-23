@@ -109,19 +109,22 @@
     )
 )
 
-(defun ass-get-buffer-file-name (ext)
-  ""
-  (concat (file-name-sans-extension (buffer-file-name))
-          ext
-          ))
+(defun ass-get-buffer-file-name ()
+  (file-name-sans-extension (buffer-file-name))
+  )
 
 (defun ass-get-video-name ()
   "Construct the name of the video file for current buffer"
-  (cond
-   ((file-readable-p (ass-get-buffer-file-name ".mp4")) (ass-get-buffer-file-name ".mp4"))
-   ((file-readable-p (ass-get-buffer-file-name ".mkv")) (ass-get-buffer-file-name ".mkv"))
-   ((file-readable-p (ass-get-buffer-file-name ".avi")) (ass-get-buffer-file-name ".avi"))
-   )
+  (let (
+        (extensions (list "mp4" "mkv" "avi"))
+        )
+    (dolist (ext extensions)
+      (let ((candidate-filename (concat (ass-get-buffer-file-name) "." ext)))
+       (when (file-readable-p candidate-filename)
+         (return candidate-filename)
+         ))
+      )
+    )
   )
 
 (defun ass-get-current-start-time ()
