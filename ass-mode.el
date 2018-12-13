@@ -16,6 +16,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (require 's)
+(require 'seq)
 
 (define-derived-mode ass-mode fundamental-mode "SSA/ASS"
   "Major mode for editing SSA/ASS ((Advanced) SubStation Alpha) subtitles"
@@ -40,6 +41,10 @@
   "Получает список дорожек (с целью выцепить потом из них дорожки с сабами)"
   (interactive)
   (process-lines "mkvmerge" "--identify" file-name)
+  )
+
+(defun ass-get-buffer-lines ()
+  (s-lines (buffer-substring-no-properties (point-min) (point-max)))
   )
 
 (defun ass-get-frame-rate (file-name)
@@ -156,6 +161,10 @@
          )
       (buffer-substring-no-properties point-start point-end))
     )
+  )
+
+(defun ass-get-styles-names ()
+  (seq-filter (apply-partially #'string-match-p "^Style:.+") (ass-get-buffer-lines))
   )
 
 (defun ass-get-events-list ()
