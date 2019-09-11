@@ -18,6 +18,10 @@
 (require 's)
 (require 'seq)
 
+;;;###autoload
+(add-to-list auto-mode-alist '("\\.ssa$" . ass-mode))
+
+;;;###autoload
 (define-derived-mode ass-mode fundamental-mode "SSA/ASS"
   "Major mode for editing SSA/ASS ((Advanced) SubStation Alpha) subtitles"
   (setq font-lock-defaults '(ass-font-lock-keywords nil t nil nil))
