@@ -19,7 +19,8 @@
 (require 'seq)
 
 ;;;###autoload
-(add-to-list auto-mode-alist '("\\.ssa$" . ass-mode))
+(add-to-list 'auto-mode-alist '("\\.ssa$" . ass-mode))
+(add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 ;;;###autoload
 (define-derived-mode ass-mode fundamental-mode "SSA/ASS"
@@ -288,8 +289,6 @@
       )
     )
   )
-
-(add-to-list 'auto-mode-alist '("\\.ass$" . ass-mode))
 
 (defvar ass-mode-map (make-keymap))
 (define-key ass-mode-map "\C-c\C-e" 'print-events-list)
