@@ -131,7 +131,7 @@
     (dolist (ext extensions)
       (let ((candidate-filename (concat (ass-get-buffer-file-name) "." ext)))
        (when (file-readable-p candidate-filename)
-         (return candidate-filename)
+         (cl-return candidate-filename)
          ))
       )
     )
